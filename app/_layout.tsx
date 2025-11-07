@@ -12,7 +12,7 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen 
           name="index" 
-          options={{ headerShown: false }}    // 👈 hides the "index" header
+          options={{ headerShown: false }}    //  hides the "index" header
         />
         <Stack.Screen 
           name="details" 
