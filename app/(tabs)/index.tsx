@@ -1,98 +1,175 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Platform,
+  Image,
+  type ColorValue,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+// ===== Local Assets =====
+import photosIcon from "../../assets/images/photos_icon_apple.png";
 
-export default function HomeScreen() {
+// ===== Data Model =====
+type Item = {
+  id: string;
+  title: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  gradient: readonly [ColorValue, ColorValue];
+  message: string;
+};
+
+// ===== App Items =====
+const ITEMS: Item[] = [
+  { id: "calls", title: "Calls", icon: "call", gradient: ["#38ef7d", "#11998e"] as const, message: "Make calls from here" },
+  { id: "camera", title: "Camera", icon: "camera", gradient: ["#747d8c", "#a4b0be"] as const, message: "Welcome to the camera app" },
+  { id: "messages", title: "Messages", icon: "chatbubbles", gradient: ["#34d058", "#28a745"] as const, message: "Welcome to your Messages" },
+  { id: "music", title: "Music", icon: "musical-notes", gradient: ["#FF616D", "#FF9966"] as const, message: "Welcome to the Music Selection Screen" },
+  { id: "photos", title: "Photos", icon: "flower", gradient: ["#fdfbfb", "#ebedee"] as const, message: "Welcome to the Photos Screen" },
+];
+
+// ===== Main Component =====
+export default function HomeGrid() {
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+
+  // --- Renders each grid item ---
+  const renderItem = ({ item }: { item: Item }) => (
+    <Pressable
+      onPress={() =>
+        router.push({
+          pathname: "/details",
+          params: {
+            title: item.title,
+            message: item.message,
+            color: item.gradient[0] as string,
+          },
+        })
+      }
+      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+      android_ripple={{ color: "rgba(0,0,0,0.08)" }}
+    >
+      <View style={styles.cardBody}>
+        {item.id === "photos" ? (
+          <View style={styles.photoWrap}>
+            <Image source={photosIcon} style={styles.photoImage} resizeMode="contain" />
+          </View>
+        ) : (
+          <LinearGradient
+            colors={item.gradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.iconWrap}
+          >
+            <Ionicons name={item.icon} size={100} color="#fff" />
+          </LinearGradient>
+        )}
+        <Text style={styles.label} numberOfLines={1}>{item.title}</Text>
+      </View>
+    </Pressable>
+  );
+
+  // --- Screen Layout ---
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
-
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <SafeAreaView style={[styles.safe, { paddingTop: insets.top / 2 }]}>
+      <StatusBar style="dark" backgroundColor="#f4f6fb" />
+      <FlatList
+        data={ITEMS}
+        keyExtractor={(i) => i.id}
+        numColumns={2}
+        columnWrapperStyle={styles.row}
+        contentContainerStyle={styles.listContent}
+        renderItem={renderItem}
+        showsVerticalScrollIndicator={false}
+      />
+    </SafeAreaView>
   );
 }
 
+// ===== Styles =====
+const CARD_RADIUS = 22;
+
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  safe: {
+    flex: 1,
+    backgroundColor: "#f4f6fb",
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  listContent: {
+    paddingHorizontal: 12,
+    paddingBottom: 20,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  row: {
+    justifyContent: "space-between",
+  },
+  card: {
+    width: "48%",
+    aspectRatio: 0.88,
+    backgroundColor: "#fff",
+    borderRadius: CARD_RADIUS,
+    overflow: "hidden",
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
+  },
+  cardPressed: {
+    transform: [{ scale: Platform.OS === "ios" ? 0.98 : 1 }],
+  },
+  cardBody: {
+    height: 50,
+    width: 200,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingTop: 10,
+    paddingHorizontal: 8,
+  },
+  iconWrap: {
+    width: "72%",
+    height: 170,
+    aspectRatio: 1,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+  photoWrap: {
+    width: "95%",
+    aspectRatio: 1,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
+    shadowColor: "#00000001",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+    backgroundColor: "#fff",
+  },
+  photoImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 16,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
+    color: "#111",
   },
 });
