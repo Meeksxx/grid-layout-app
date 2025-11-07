@@ -16,7 +16,9 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { StatusBar } from "expo-status-bar";
 
 // ===== Local Assets =====
-import photosIcon from "../../assets/images/photos_icon_apple.png";
+// app/index.tsx
+import photosIcon from "../assets/images/photos_icon_apple.png";
+
 
 // ===== Data Model =====
 type Item = {
@@ -111,7 +113,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: "48%",
-    aspectRatio: 0.88,
+    aspectRatio: 1,
     backgroundColor: "#fff",
     borderRadius: CARD_RADIUS,
     overflow: "hidden",
@@ -134,8 +136,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   iconWrap: {
-    width: "72%",
-    height: 170,
+    width: "82%",
     aspectRatio: 1,
     borderRadius: 20,
     alignItems: "center",
@@ -148,7 +149,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   photoWrap: {
-    width: "95%",
+    width: "78%",
     aspectRatio: 1,
     borderRadius: 20,
     alignItems: "center",
@@ -162,9 +163,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   photoImage: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 16,
+    width: "88%",
+    aspectRatio: .26,
+    borderRadius: 10,
   },
   label: {
     fontSize: 16,

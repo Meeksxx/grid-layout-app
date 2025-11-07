@@ -3,40 +3,38 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
 
-export default function DetailScreen() {
-  const { title, message, color } = useLocalSearchParams<{
-    title?: string;
-    message?: string;
-    color?: string;
+export default function Details() {
+  const { title = "Details", message = "", color } = useLocalSearchParams<{
+    title?: string | string[];
+    message?: string | string[];
+    color?: string | string[];
   }>();
 
+  const titleStr = Array.isArray(title) ? title[0] : title;
+
   return (
-    <View style={styles.container}>
-      {/* Sets the header title & gives you a back button automatically */}
-      <Stack.Screen options={{ title: title ?? "Detail" }} />
-      <View style={[styles.panel, { borderColor: color ?? "#ddd" }]}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.message}>{message}</Text>
+    <>
+      <Stack.Screen
+        options={{
+          title: titleStr,
+          headerBackTitle: "Home",
+        }}
+      />
+      <View style={styles.wrap}>
+        <View style={[styles.card, { borderColor: String(color ?? "#999") }]}>
+          <Text style={styles.title}>{titleStr}</Text>
+          <Text style={styles.message}>
+            {Array.isArray(message) ? message[0] : message}
+          </Text>
+        </View>
       </View>
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#eef0f4", padding: 24 },
-  panel: {
-    backgroundColor: "#fff",
-    borderRadius: 18,
-    borderWidth: 2,
-    padding: 24,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2
-  },
-  title: { fontSize: 22, fontWeight: "800" },
-  message: { fontSize: 16, opacity: 0.8 }
+  wrap: { flex: 1, padding: 30, justifyContent: "flex-start", backgroundColor: "#f7f8fb" },
+  card: { borderWidth: 2, borderRadius: 16, padding: 20, backgroundColor: "#fff" },
+  title: { fontSize: 22, fontWeight: "700", textAlign: "center", marginBottom: 8 },
+  message: { fontSize: 16, textAlign: "center" },
 });
